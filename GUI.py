@@ -27,11 +27,8 @@ def open_new_window():
 
     # --- Attendance Table ---
     lst = [
-        (1,'Raj','Mumbai',19),
-        (2,'Aaryan','Pune',18),
-        (3,'Vaishnavi','Mumbai',20),
-        (4,'Rachna','Mumbai',21),
-        (5,'Shubham','Delhi',21)
+        (1,'Time','Name',1),
+        
     ]
 
         # --- Attendance Table with Scrollbar ---
@@ -77,7 +74,7 @@ def open_new_window():
                     e.insert(tk.END, data[i][j])
 
     # Initial table
-    headers = ("ID", "Name", "City", "Age")
+    headers = ("ID", "Time", "Student Name", "Status")
     table = Table(frame_table, lst, headers)
 
     
