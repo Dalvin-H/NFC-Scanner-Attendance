@@ -1,5 +1,19 @@
 import tkinter as tk
 import datetime
+import serial
+import sqlite3
+
+#TODO Initialize this before pressing start! 
+# Adjust to your COM port (Windows: COM3, Linux/Mac: /dev/ttyUSB0)
+SERIAL_PORT = "COM4"
+BAUD_RATE = 115200
+
+# Create / connect to SQLite database
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
+
+# Open serial connection
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 
 def open_new_window():
     # Get values from the entries
@@ -14,7 +28,7 @@ def open_new_window():
     setup_window.destroy()  # close the current window
     
     list_window = tk.Tk()
-    list_window.geometry("600x400")
+    list_window.geometry("800x400")
     list_window.title("Attendance List")
 
     frame_meta = tk.Frame(list_window)
@@ -142,5 +156,17 @@ class_entry.grid(row=4, column=1, padx=10)
 
 time_entry = tk.Entry()
 time_entry.grid(row=5, column=1, padx=10)
+
+# Dropdown options  
+COMS = ["COM1", "COM2", "COM3", "COM4", "COM5", "COM6"]  
+
+# Selected option variable  
+opt = StringVar(value="COM1")  
+
+# Dropdown menu  
+OptionMenu(root, opt, *COMS).pack()  
+
+# Button to update label  
+ButtonCOM(root, text="Click Me", command=show).pack()  #change to set COM value for serial setup
 
 setup_window.mainloop()
