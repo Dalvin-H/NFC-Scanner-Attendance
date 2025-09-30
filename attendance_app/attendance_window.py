@@ -14,7 +14,7 @@ attendance_list = []
 
 def open_attendance(metadata, com_port):
     window = tk.Tk()
-    window.geometry("800x400")
+    window.geometry("800x500")
     window.title("Attendance NFC Scanner")
 
     # Header
@@ -70,9 +70,8 @@ def open_attendance(metadata, com_port):
         date_val = metadata["date"]
         for row in attendance_list:
             print(f"Saving {row} for {date_val}")
-            cursor.execute("INSERT INTO attendance (date, time, name, status) VALUES (?, ?, ?, ?)", 
-                           (date_val, row[1], row[2], row[3]))
-        conn.commit()
+            database.add_attendance(date_val, row[1], row[2], row[3])
+
 
     btn_add = tk.Button(window, text="Add Student", command=lambda: add_student_manual("New Student"))
     btn_add.pack(pady=5)
@@ -85,8 +84,7 @@ def open_attendance(metadata, com_port):
 
     # --- Add Student Function (from NFC scan) ---
     def add_student(uid):
-        cursor.execute("SELECT name FROM users WHERE uid = ?", (uid,))
-        result = cursor.fetchone()
+        result = database.get_student(uid)
         if result:
             student_name = result[0]
             now = datetime.datetime.now().strftime("%H:%M:%S")
