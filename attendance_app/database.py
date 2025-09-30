@@ -35,3 +35,8 @@ def add_attendance(date, time, name, status):
     cursor.execute("INSERT INTO attendance (date, time, name, status) VALUES (?, ?, ?, ?)",
                    (date, time, name, status))
     conn.commit()
+
+def empty_tables():
+    cursor.execute("DELETE FROM attendance")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='attendance'")
+    conn.commit()

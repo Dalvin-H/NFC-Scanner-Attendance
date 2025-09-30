@@ -13,6 +13,10 @@ conn = database.conn
 attendance_list = []
 
 def open_attendance(metadata, com_port):
+    # Clear attendance for a new session
+    database.empty_tables()
+    attendance_list.clear()
+
     window = tk.Tk()
     window.geometry("800x500")
     window.title("Attendance NFC Scanner")

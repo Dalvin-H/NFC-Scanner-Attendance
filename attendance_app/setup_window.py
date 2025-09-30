@@ -23,7 +23,7 @@ def update_com_ports(opt_var, dropdown):
 
 def open_setup(start_callback):
     setup_window = tk.Tk()
-    setup_window.geometry("400x300")
+    setup_window.geometry("400x400")
     setup_window.title("Attendance NFC Scanner Setup")
 
     tk.Label(setup_window, text='Name', pady=10).grid(row=0)
@@ -75,8 +75,8 @@ def open_setup(start_callback):
             "notes": notes_box.get("1.0", tk.END).strip(),
             "com_port": opt_var.get().split(" ")[0]  # Extract COM port only
         }
-        start_callback(metadata)
         setup_window.destroy()
+        start_callback(metadata)
 
     start_button = tk.Button(setup_window, text="Start", width=15, height=5, command=on_start)
     start_button.grid(row=7, column=1, pady=10)
