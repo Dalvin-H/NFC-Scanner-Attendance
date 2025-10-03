@@ -62,7 +62,6 @@ def open_attendance(metadata, com_port):
                     e.insert(tk.END, value)
 
     headers = ("ID", "Time", "Student Name", "Status")
-    attendance_list.append((1, datetime.datetime.now().strftime("%H:%M:%S"), "Demo Student", "Present"))
     table = Table(frame_table, attendance_list, headers)
 
     def add_student_manual(name, status="Present"):
@@ -72,6 +71,7 @@ def open_attendance(metadata, com_port):
 
     def save_attendance():
         date_val = metadata["date"]
+        database.empty_tables()
         for row in attendance_list:
             print(f"Saving {row} for {date_val}")
             database.add_attendance(date_val, row[1], row[2], row[3])
