@@ -2,6 +2,8 @@ from customtkinter import *
 import serial.tools.list_ports
 import time
 import threading
+from datetime import datetime
+from tkinter import messagebox
 
 # =========================
 # GLOBAL CONFIGURATION
@@ -127,6 +129,7 @@ def open_setup(start_callback):
     # Date
     create_label(setup_window, "Date", 0, 2, pady=(PAD_Y, 2))
     date_entry = create_entry(setup_window, 1, 2, pady=(2, PAD_Y))
+    add_placeholder(date_entry, datetime.now().strftime("%d/%m/%Y"))
 
     # COM port dropdown
     create_label(setup_window, "USB COM", 2, 2)
@@ -151,29 +154,36 @@ def open_setup(start_callback):
     threading.Thread(target=update_com_ports, args=(com_list,), daemon=True).start()
 
     def on_start():
-            metadata = {
-                "name": name_entry.get(),
-                "date": date_entry.get(),
-                "course": course_entry.get(),
-                "group": group_entry.get(),
-                "classroom": classroom_entry.get(),
-                "start_time": start_time_entry.get(),
-                "notes": notes_entry.get("1.0", tk.END).strip(),
-                "com_port": opt_var.get().split(" ")[0]  # Extract COM port only
-            }
-            setup_window.destroy()
-            start_callback(metadata)
+        # Check time format (hh:mm)
+        try:
+            datetime.strptime(start_time_entry.get(), "%H:%M")
+        except ValueError:
+            messagebox.showerror("Invalid or missing time", "Please insert starting time or use HH:MM format!")
+            return  # Stop further execution
+
+        metadata = {
+            "name": name_entry.get(),
+            "date": date_entry.get(),
+            "course": course_entry.get(),
+            "group": group_entry.get(),
+            "classroom": classroom_entry.get(),
+            "start_time": start_time_entry.get(),
+            "notes": notes_entry.get("0.0", "end").strip(),  # CTkTextbox uses "0.0" instead of "1.0"
+            "com_port": com_list.get().split(" ")[0]  # Extract COM port only
+        }
+        setup_window.destroy()
+        start_callback(metadata)
 
     start_button = CTkButton(
         setup_window,
         text="Start",
-        height=40,  # makes it taller
+        height=40,
         command=on_start,
         fg_color=COLOR_TEXT,
         bg_color=COLOR_BG,
         text_color="white",
         corner_radius=32,
-        font=("Arial", 16, "bold")  # big and bold text
+        font=("Arial", 16, "bold")
     )
     start_button.grid(row=10, column=1, columnspan=2, sticky="ew", padx=PAD_X, pady=PAD_Y)
 
