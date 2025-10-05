@@ -17,6 +17,8 @@ def open_attendance(metadata, com_port):
     database.empty_tables()
     attendance_list.clear()
 
+    start_time = datetime.datetime.strptime(metadata["start_time"], "%H:%M").time()
+
     window = tk.Tk()
     window.geometry("800x500")
     window.title("Attendance NFC Scanner")
@@ -87,16 +89,7 @@ def open_attendance(metadata, com_port):
     btn_close.pack(pady=10)
 
     # --- Add Student Function (from NFC scan) ---
-    def add_student(uid):
-        result = database.get_student(uid)
-        if result:
-            student_name = result[0]
-            now = datetime.datetime.now().strftime("%H:%M:%S")
-            new_id = len(attendance_list) + 1
-            attendance_list.append((new_id, now, student_name, "Present"))
-            Table(frame_table, attendance_list, headers)
-        else:
-            print(f"Unknown UID: {uid}")
+    
 
     # --- Serial Reader Thread ---
     def read_serial():
@@ -107,11 +100,45 @@ def open_attendance(metadata, com_port):
             print(f"Serial error: {e}")
             return
 
+        def return_feedback_ESP(input):
+            try:
+                if input == "valid":
+                    ser.write(b'1')  # send a single byte
+                else:
+                    ser.write(b'0')
+                print("Feedback sent to ESP:", input)
+            except Exception as e:
+                print(f"Serial write error: {e}")
+
+        def add_student(uid):
+                result = database.get_student(uid)
+                if result:
+                    student_name = result[0]
+                    now = datetime.datetime.now()
+                    current_time = now.time()
+
+                    if current_time > start_time:
+                        status = "Late"
+                    else:
+                        status = "Present"
+
+                    new_id = len(attendance_list) + 1
+                    attendance_list.append((new_id, now.strftime("%H:%M:%S"), student_name, status))
+                    Table(frame_table, attendance_list, headers)
+                    return_feedback_ESP("valid")
+                else:
+                    print(f"Unknown UID: {uid}")
+                    return_feedback_ESP("invalid")
+
         while True:
             line = ser.readline().decode("utf-8").strip()
             if line:
                 print(f"UID: {line}")
                 window.after(0, add_student, line)
+
+
+                
+
 
     threading.Thread(target=read_serial, daemon=True).start()
 

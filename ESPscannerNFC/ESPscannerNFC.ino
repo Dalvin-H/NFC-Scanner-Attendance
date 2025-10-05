@@ -23,9 +23,10 @@ void loop() {
   if (!rfid.PICC_IsNewCardPresent()) return;
   if (!rfid.PICC_ReadCardSerial()) return;
 
-  tone(BUZZER_PIN, 800);
-  delay(200);
+  tone(BUZZER_PIN, 1000); // Valid beep
+  delay(100);
   noTone(BUZZER_PIN);
+
 
   // Print UID as HEX string (no spaces)
   for (byte i = 0; i < rfid.uid.size; i++) {
@@ -37,4 +38,15 @@ void loop() {
   rfid.PICC_HaltA();
   rfid.PCD_StopCrypto1();
   delay(300);
+
+  while (!Serial.available());
+  int x = Serial.readString().toInt();
+  
+  if(x == 1) {
+    
+} else {
+    tone(BUZZER_PIN, 100); // Invalid beep
+    delay(1000);
+}
+noTone(BUZZER_PIN);
 }
